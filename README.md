@@ -131,20 +131,6 @@ sudo vi /etc/prometheus/prometheus.yml
 ```
 
 Paste the following content (also available in `configs/prometheus.yml` in this repo):
-
-```yaml
-global:
-  scrape_interval: 15s   # Default: scrape every 15 seconds
-
-scrape_configs:
-
-  # Job 1: Prometheus scrapes itself
-  - job_name: 'prometheus'
-    scrape_interval: 5s
-    static_configs:
-      - targets: ['localhost:9090']
-```
-
 ```yaml
 global:
   scrape_interval: 15s   # Default: scrape every 15 seconds

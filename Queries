@@ -1,0 +1,89 @@
+🧪 PROMETHEUS QUICK CHECK QUERIES
+👉 Use in Prometheus → Graph → Table mode
+________________________________________
+1. Check if containers are being scraped
+container_last_seen
+👉 Shows all active containers (basic sanity check)
+________________________________________
+2. Count total containers
+count(container_last_seen)
+👉 Confirms how many containers Prometheus sees
+________________________________________
+3. CPU usage (raw counter)
+container_cpu_usage_seconds_total
+👉 Verifies CPU metric exists (before rate calculation)
+________________________________________
+4. Memory usage
+container_memory_usage_bytes
+👉 Shows memory used per container
+________________________________________
+5. Network receive
+container_network_receive_bytes_total
+👉 Confirms network metrics available
+________________________________________
+6. Disk usage (node level)
+node_filesystem_size_bytes
+👉 Validates node exporter is working
+________________________________________
+7. Node CPU
+node_cpu_seconds_total
+👉 Raw CPU metric for host
+________________________________________
+8. Check labels (VERY IMPORTANT)
+container_cpu_usage_seconds_total{container_label_com_docker_compose_service="grafana"}
+👉 Confirms correct label key/value
+________________________________________
+9. List all services (labels)
+label_values(container_cpu_usage_seconds_total, container_label_com_docker_compose_service)
+👉 Shows all container/service names
+________________________________________
+10. Check if Prometheus is scraping itself
+up
+👉 Shows status of all targets (1 = up)
+
+
+
+📊 GRAFANA / GRAPH QUERIES (REAL USAGE)
+
+👉 Use in Grafana panels or Prometheus Graph
+
+ 1. CPU usage per container
+sum(rate(container_cpu_usage_seconds_total[1m])) by (container_label_com_docker_compose_service) * 100
+👉 Shows % CPU usage per container
+________________________________________
+ 2. Memory usage per container
+sum(container_memory_usage_bytes) by (container_label_com_docker_compose_service)
+👉 Shows memory usage per container
+________________________________________
+ 3. Network RX per container
+sum(rate(container_network_receive_bytes_total[1m])) by (container_label_com_docker_compose_service)
+👉 Incoming traffic per container
+________________________________________
+ 4. Network TX per container
+sum(rate(container_network_transmit_bytes_total[1m])) by (container_label_com_docker_compose_service)
+👉 Outgoing traffic per container
+________________________________________
+ 5. Total CPU usage (host)
+100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)
+👉 Overall system CPU usage %
+________________________________________
+ 6. Memory usage % (host)
+(node_memory_MemTotal - node_memory_MemAvailable) / node_memory_MemTotal * 100
+👉 System memory usage %
+________________________________________
+ 7. Disk usage %
+(node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes * 100
+👉 Disk usage %
+________________________________________
+ 8. Load average
+node_load1
+👉 System load (short-term pressure)
+________________________________________
+ 9. Active containers over time
+count(container_last_seen)
+👉 Track container count trends
+________________________________________
+ 10. CPU usage (single container)
+rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service="grafana"}[1m]) * 100
+👉 Debug specific container
+
